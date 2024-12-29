@@ -3,10 +3,9 @@ import requests
 from bs4 import BeautifulSoup
 import threading
 import random
+import csv
 import os
-from datetime import datetime
 from urllib.parse import urlparse
-from itertools import cycle
 
 
 # ---------------- Esc/Results=10 ----------------
@@ -104,8 +103,10 @@ def save_article(topic, url, results_count):
 
     os.makedirs("articles", exist_ok=True)
     
+    mode = 'w' if results_count == 1 else 'a'
+    
     try:
-        with open(filename, 'a', encoding='utf-8') as f:
+        with open(filename, mode, encoding='utf-8') as f:
             f.write(f"{url}\n")
             
         print(f"{Green}Saved URL to {filename}{Normal}")
@@ -114,16 +115,13 @@ def save_article(topic, url, results_count):
 
 def convert_to_csv():
     try:
-        import csv
-        from datetime import datetime
-        
-        with open("articles/all_urls.txt", 'r', encoding='utf-8') as f:
-            urls = [line.strip() for line in f if line.strip()]
         
         with open(CSV_FILENAME, 'w', newline='', encoding='utf-8') as f:
             writer = csv.writer(f)
-            for url in urls:
-                writer.writerow([url])
+            with open("articles/all_urls.txt", 'r', encoding='utf-8') as txt_file:
+                urls = [line.strip() for line in txt_file if line.strip()]
+                for url in urls:
+                    writer.writerow([url])
         
         print(f"{Green}Successfully converted URLs to {CSV_FILENAME}{Normal}")
     except Exception as e:
